@@ -6,7 +6,7 @@
 //  Copyright © 2017 Gianluca Rago. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 class Message {
     

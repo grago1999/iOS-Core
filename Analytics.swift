@@ -6,23 +6,19 @@
 //  Copyright © 2017 Gianluca Rago. All rights reserved.
 //
 
-import UIKit
 import SwiftyJSON
 
 class Analytics {
     
-    static var hasPrepared:Bool = false
-    
-    private static var appId:Int64 = Config.appId
     private static var deviceId:String = hashedDeviceId()
     
     static func report(actionTypeId:String, elementId:String?) {
-        var postDict:[String:String] = ["appId":String(appId), "deviceId":deviceId, "actionTypeId":actionTypeId]
+        var post:[String:String] = ["appId":String(Config.appId), "deviceId":deviceId, "actionTypeId":actionTypeId]
         if let actionElementId = elementId {
-            postDict["elementId"] = actionElementId
+            post["elementId"] = actionElementId
         }
-        Connection.request(path:"/analytics/api/v1/report.php", postDict:postDict, completionHandler: { success, msg, json in
-            Common.log(prefix:.debug, str:msg)
+        Connection.request(baseUrl:Config.analyticsUrl, path:"/analytics/api/v1/report", post:post, completionHandler: { res in
+            Common.log(prefix:.debug, str:res.msg)
         })
     }
     

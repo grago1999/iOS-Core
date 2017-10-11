@@ -1,6 +1,6 @@
 //
 //  Locations.swift
-//  Location Base
+//  Core
 //
 //  Created by Gianluca Rago on 7/8/17.
 //  Copyright © 2017 Gianluca Rago. All rights reserved.
@@ -13,7 +13,7 @@ class Location {
     
     private static var locationManager:CLLocationManager?
     
-    static func prepare() -> CLLocationManager {
+    static func prepare() -> CLLocationManager? {
         if let manager = locationManager {
             return manager
         } else {
@@ -22,20 +22,24 @@ class Location {
             if CLLocationManager.locationServicesEnabled() {
                 locationManager!.desiredAccuracy = kCLLocationAccuracyBest
                 locationManager!.startUpdatingLocation()
+                if CLLocationManager.headingAvailable() {
+                    locationManager!.headingFilter = 2
+                    locationManager!.startUpdatingHeading()
+                }
+                return locationManager!
             }
-            if CLLocationManager.headingAvailable() {
-                locationManager!.headingFilter = 2
-                locationManager!.startUpdatingHeading()
-            }
-            return locationManager!
+            return nil
         }
     }
     
-    static func currentCoords() -> CLLocationCoordinate2D {
+    static func coords() -> CLLocationCoordinate2D? {
         if let manager = locationManager {
             return manager.location!.coordinate
         } else {
-            return prepare().location!.coordinate
+            if let manager = prepare() {
+                return manager.location!.coordinate
+            }
+            return nil
         }
     }
     

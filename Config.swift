@@ -16,6 +16,7 @@ class Config {
     static let debugLevel:Common.LogType = .debug
     
     static let url = dev ? "http://localhost" : "https://google.com"
+    static let analyticsUrl = dev ? "http://localhost" : "https://google.com"
     
     static let appId:Int64 = 987654321
 

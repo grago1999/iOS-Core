@@ -1,6 +1,6 @@
 //
 //  Settings.swift
-//  Location Base
+//  Core
 //
 //  Created by Gianluca Rago on 8/13/17.
 //  Copyright © 2017 Gianluca Rago. All rights reserved.

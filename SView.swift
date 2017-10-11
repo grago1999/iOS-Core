@@ -1,6 +1,6 @@
 //
 //  SView.swift
-//  Location Base
+//  Core
 //
 //  Created by Gianluca Rago on 7/8/17.
 //  Copyright © 2017 Gianluca Rago. All rights reserved.
@@ -26,8 +26,8 @@ class SView: UIView {
     func addShadow() {
         self.layer.shadowColor = UIColor.black.cgColor
         self.layer.shadowRadius = 0.0
-        self.layer.shadowOpacity = View.shadowOpacity
-        self.layer.shadowOffset = View.shadowSize
+        self.layer.shadowOpacity = View.Shadow.opacity
+        self.layer.shadowOffset = View.Shadow.size
         self.layer.shadowPath = UIBezierPath(roundedRect:self.bounds, cornerRadius:self.layer.cornerRadius).cgPath
         self.layer.shouldRasterize = true
         self.layer.rasterizationScale = UIScreen.main.scale
@@ -39,7 +39,7 @@ class SView: UIView {
     }
     
     func hide() {
-        UIView.animate(withDuration:View.animDuration, animations: {
+        UIView.animate(withDuration:View.Animation.duration, animations: {
             self.alpha = 0
         }, completion: { done in
             Common.isLoading = false

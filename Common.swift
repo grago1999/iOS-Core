@@ -25,9 +25,11 @@ class Common {
     
     static var globalMessages:[GlobalMessage] = []
     
-    static let delay:Double = 4.0
+    static let delay:Double = 2.0
     
     static var isLoading:Bool = false
+    
+    static var words:[String]?
     
     static func hash(str:String) -> String {
         let data = NSData(data:str.data(using:String.Encoding.utf8)!)
@@ -39,8 +41,6 @@ class Common {
         }
         return output as String
     }
-    
-    static var words:[String]?
     
     private static func openWordsFile() -> Bool {
         if let file = Bundle.main.path(forResource:"words", ofType:"txt") {
@@ -57,7 +57,7 @@ class Common {
         return false
     }
     
-    static func randText(length:Int, spaces:Bool) -> String? {
+    static func randPhrase(length:Int, spaces:Bool) -> String? {
         if let existingWords = words {
             var randomText = ""
             for _ in 0...length {
@@ -68,7 +68,7 @@ class Common {
             }
             return randomText
         } else {
-            return openWordsFile() ? rand(length:length, spaces:spaces) : nil
+            return openWordsFile() ? randPhrase(length:length, spaces:spaces) : nil
         }
     }
     
@@ -84,14 +84,14 @@ class Common {
         var str:String = ""
         for _ in 0 ..< num {
             let rand = arc4random_uniform(UInt32(alphabet.characters.count))
-            str += Character(UnicodeScalar(NSString(string:alphabet).character(at:Int(rand)))!)
+            str += String(UnicodeScalar(NSString(string:alphabet).character(at:Int(rand)))!)
         }
         return str
     }
     
     static func deviceStats() -> String {
         let deviceVersion = UIDevice.current.systemName+UIDevice.current.systemVersion
-        let isLowPowerModeEnabled:String = ProcessInfo.processInfo.isLowPowerModeEnabled ? "Low Power Mode Enabled" : ""
+        let isLowPowerModeEnabled:String = ProcessInfo.processInfo.isLowPowerModeEnabled ? "Low Power Mode" : ""
         return "\n\n\n\n\n\nThis is just some information that can help us solve any issues you're having:\n\n"+deviceVersion+"\n"+isLowPowerModeEnabled
     }
 

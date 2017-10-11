@@ -6,9 +6,7 @@
 //  Copyright © 2017 Gianluca Rago. All rights reserved.
 //
 
-import UIKit
-
-class MessageData {
+class LocaleData {
     
     static let enData:[String:String] = [
         "some-id":"some message"

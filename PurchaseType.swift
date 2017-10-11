@@ -6,8 +6,7 @@
 //  Copyright © 2017 Gianluca Rago. All rights reserved.
 //
 
-import UIKit
-import StoreKit
+import Foundation
 
 class PurchaseType {
 
@@ -17,17 +16,17 @@ class PurchaseType {
     private var title:String
     private var description:String
     
-    private var priceUSD:Double
+    private var price:Double
     private var imgName:String
     
     private var creationDate:Date?
     
-    init(id:Int, productId:String, title:String, description:String, priceUSD:Int, imgName:String) {
+    init(id:Int, productId:String, title:String, description:String, price:Double, imgName:String) {
         self.id = id
         self.productId = productId
         self.title = title
         self.description = description
-        self.priceUSD = Double(priceUSD)/100.0
+        self.price = price
         self.imgName = imgName
     }
     

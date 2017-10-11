@@ -1,6 +1,6 @@
 //
 //  Notifications.swift
-//  Location Base
+//  Core
 //
 //  Created by Gianluca Rago on 8/4/17.
 //  Copyright © 2017 Gianluca Rago. All rights reserved.

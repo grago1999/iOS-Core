@@ -1,21 +1,21 @@
 //
-//  Messages.swift
-//  Location Base
+//  LocaleMessages.swift
+//  Core
 //
 //  Created by Gianluca Rago on 7/8/17.
 //  Copyright © 2017 Gianluca Rago. All rights reserved.
 //
 
-class Messages {
+class LocaleMessages {
     
     static var locale:String = "en"
-    static var localeData:[String:String] = MessageData.enData
+    static var localeData:[String:String] = LocaleData.enData
     
     static func get(id:String) -> String {
-        return localeData[id] != nil ? localeData[id]! : notFound(id:id)
-    }
-    
-    private static func notFound(id:String) -> String {
+        if let value = localeData[id] {
+            Common.log(prefix:.debug, str:"Found message for "+id)
+            return value
+        }
         Common.log(prefix:.warning, str:"Could not find message for "+id)
         return ""
     }

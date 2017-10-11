@@ -1,12 +1,11 @@
 //
 //  Responses.swift
-//  Location Base
+//  Core
 //
 //  Created by Gianluca Rago on 8/13/17.
 //  Copyright © 2017 Gianluca Rago. All rights reserved.
 //
 
-import UIKit
 import SwiftyJSON
 
 class Responses {
@@ -20,19 +19,19 @@ class Responses {
         "msg": "Failed to fake response",
     ]
     
-    private static var responses:[String:JSON] = [:]
+    private static var all:[String:JSON] = [:]
     
     static func addFake(path:String, data:JSON) {
         var response:JSON = general
         response["data"] = data
-        if responses[path] == nil {
-            responses[path] = response
+        if all[path] == nil {
+            all[path] = response
         }
         Common.log(prefix:.debug, str:"Added fake response for "+path)
     }
     
     static func rand(path:String) -> JSON {
-        return responses[path] != nil ? responses[path]! : error
+        return all[path] != nil ? all[path]! : error
     }
 
 }

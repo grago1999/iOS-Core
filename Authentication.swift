@@ -1,23 +1,22 @@
 //
 //  Authentication.swift
-//  Location Base
+//  Core
 //
 //  Created by Gianluca Rago on 8/12/17.
 //  Copyright © 2017 Gianluca Rago. All rights reserved.
 //
 
-import UIKit
 import SwiftyJSON
 
 class Authentication {
     
     static func login(email:String, p:String, completionHandler: @escaping (Bool, String) -> Void) {
-        if Connection.hasPrepared {
-            Connection.request(path:"/base/api/v1/includes/login.php", postDict:["email":email, "p":Common.hash(str:p), "client":"0", "locale":"en"], completionHandler: { success, msg, json in
-                Common.log(prefix:.debug, str:"Login \(success)")
-                if success {
-                    if validateClient(json:json) {
-                        Users.main = Users.to(from:json["data"])
+        if Connection.prepared {
+            Connection.request(path:"/base/api/v1/includes/login", post:["email":email, "p":Common.hash(str:p), "client":"0", "locale":"en"], completionHandler: { res in
+                Common.log(prefix:.debug, str:"Login \(res.success)")
+                if res.success {
+                    if validate(client:res.data) {
+                        Users.main = Users.to(from:res.data)
                         Users.addRetrieved(user:Users.main!)
                         let hasEmailSaved:Bool = Secure.add(value:email, key:"email")
                         let hasPSaved:Bool = Secure.add(value:p, key:"p")
@@ -26,10 +25,10 @@ class Authentication {
                         }
                     } else {
                         Common.log(prefix:.debug, str:"Invalid client")
-                        completionHandler(false, msg)
+                        completionHandler(false, res.msg)
                     }
                 }
-                completionHandler(success, msg)
+                completionHandler(res.success, res.msg)
             })
         } else {
             Common.attemptLater(fromNow:0.2, attempt: {
@@ -41,13 +40,13 @@ class Authentication {
     }
     
     static func register(email:String, p:String, completionHandler: @escaping (Bool, String) -> Void) {
-        Connection.request(path:"/base/api/v1/includes/register.php", postDict:["email":email, "p":Common.hash(str:p), "client":"0", "locale":"en"], completionHandler: { success, msg, json in
-            if success {
-                if validateClient(json:json) {
-                    Users.main = Users.to(from:json["data"])
+        Connection.request(path:"/base/api/v1/includes/register", post:["email":email, "p":Common.hash(str:p), "client":"0", "locale":"en"], completionHandler: { res in
+            if res.success {
+                if validate(client:res.data) {
+                    Users.main = Users.to(from:res.data)
                     Users.addRetrieved(user:Users.main!)
                     Settings.set(value:true, key:.hasSignedInWithEmail)
-                    Common.log(prefix:.debug, str:"Register \(success) as \(Users.main!.getUsername())")
+                    Common.log(prefix:.debug, str:"Register \(res.success) as \(Users.main!.getUsername())")
                     let hasEmailSaved:Bool = Secure.add(value:email, key:"email")
                     let hasPSaved:Bool = Secure.add(value:p, key:"p")
                     if hasEmailSaved && hasPSaved {
@@ -55,31 +54,31 @@ class Authentication {
                     }
                 } else {
                     Common.log(prefix:.debug, str:"Invalid client")
-                    completionHandler(false, msg)
+                    completionHandler(false, res.msg)
                 }
             } else {
-                Common.log(prefix:.debug, str:"Login \(success)")
+                Common.log(prefix:.debug, str:"Login \(res.success)")
             }
-            completionHandler(success, msg)
+            completionHandler(res.success, res.msg)
         })
     }
     
     static func update(p:String, completionHandler: @escaping (Bool, String) -> Void) {
         let hashedP = Common.hash(str:p)
-        Connection.request(path:"/base/api/v1/user/updatePassword.php", postDict:["p":hashedP], completionHandler: {
-            success, msg, json in
-            if success {
+        Connection.request(path:"/base/api/v1/user/updatePassword", post:["p":hashedP], completionHandler: {
+            res in
+            if res.success {
                 Settings.set(value:true, key:.needsToUpdatePassword)
                 let hasPSaved:Bool = Secure.add(value:hashedP, key:"p")
                 if hasPSaved {
                     Common.log(prefix:.debug, str:"New password ready")
-                    completionHandler(true, msg)
+                    completionHandler(true, res.msg)
                 } else {
                     Common.log(prefix:.error, str:"Could not handle password locally")
                     completionHandler(false, "Could not handle password locally")
                 }
             }
-            completionHandler(success, msg)
+            completionHandler(res.success, res.msg)
         })
     }
     
@@ -106,9 +105,8 @@ class Authentication {
     
     static func validate(client:JSON) -> Bool {
         Common.globalMessages = []
-        let retrievedProdVersionName:String = json["data"]["prodVersionName"].stringValue
-        let retrievedClientVersion:String = json["data"]["clientVersion"].stringValue
-        let retrievedGlobalMessages:[JSON] = json["data"]["globalMessages"].arrayValue
+        let retrievedClientVersion:String = client["data"]["clientVersion"].stringValue
+        let retrievedGlobalMessages:[JSON] = client["data"]["globalMessages"].arrayValue
         for retrievedGlobalMessage in retrievedGlobalMessages {
             let globalMessage:GlobalMessage = GlobalMessage(id:retrievedGlobalMessage["id"].intValue, title:retrievedGlobalMessage["title"].stringValue, description:retrievedGlobalMessage["description"].stringValue, imgName:retrievedGlobalMessage["imgName"].stringValue, shouldStop:retrievedGlobalMessage["shouldStop"].boolValue)
             Common.globalMessages.append(globalMessage)
@@ -117,7 +115,7 @@ class Authentication {
     }
     
     static func randomHashedP() -> String {
-        let orgStr:String = Common.words != nil ? Common.rand(length:6, spaces:false)! : String(Common.rand(num:10))
+        let orgStr:String = Common.words != nil ? Common.randPhrase(length:6, spaces:false)! : String(Common.rand(num:10))
         return Common.hash(str:orgStr)
     }
     
