@@ -244,7 +244,6 @@
 				9931E5A11F8B09CF0088939A /* Dates.swift */,
 				9931E5A21F8B09CF0088939A /* Fonts.swift */,
 				9931E59C1F8B09CF0088939A /* GlobalMessage.swift */,
-				9931E59D1F8B09CF0088939A /* LICENSE */,
 				9931E5921F8B09CE0088939A /* LocaleData.swift */,
 				9931E58B1F8B09CE0088939A /* LocaleMessages.swift */,
 				9931E58E1F8B09CE0088939A /* Locations.swift */,
@@ -263,6 +262,7 @@
 				9931E5891F8B09CE0088939A /* User.swift */,
 				9931E5A31F8B09CF0088939A /* Users.swift */,
 				9931E58F1F8B09CE0088939A /* View.swift */,
+				9931E59D1F8B09CF0088939A /* LICENSE */,
 				9931E5901F8B09CE0088939A /* words.txt */,
 			);
 			path = Core;
@@ -775,8 +775,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = Example/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ragoware.Example;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Example/Example-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -793,8 +794,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = Example/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ragoware.Example;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Example/Example-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
