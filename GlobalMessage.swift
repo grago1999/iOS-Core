@@ -10,14 +10,14 @@ import Foundation
 
 class GlobalMessage {
     
-    private var id:Int
-    private var title:String
-    private var description:String
-    private var imgName:String
-    private var shouldStop:Bool
-    private var startDate:Date?
-    private var endDate:Date?
-    private var creationDate:Date?
+    public private(set) var id:Int
+    public private(set) var title:String
+    public private(set) var description:String
+    public private(set) var imgName:String
+    public private(set) var shouldStop:Bool
+    public private(set) var startDate:Date?
+    public private(set) var endDate:Date?
+    public private(set) var creationDate:Date?
     
     init(id:Int, title:String, description:String, imgName:String, shouldStop:Bool) {
         self.id = id
@@ -25,26 +25,6 @@ class GlobalMessage {
         self.description = description
         self.imgName = imgName
         self.shouldStop = shouldStop
-    }
-    
-    func getId() -> Int {
-        return id
-    }
-    
-    func getTitle() -> String {
-        return title
-    }
-    
-    func getDescription() -> String {
-        return description
-    }
-    
-    func getImgName() -> String {
-        return imgName
-    }
-    
-    func getShouldStop() -> Bool {
-        return shouldStop
     }
     
 }

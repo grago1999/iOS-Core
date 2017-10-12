@@ -10,11 +10,11 @@ import Foundation
 
 class Purchase {
 
-    private var id:Int
+    public private(set) var id:Int
     
-    private var purchaseTypeId:Int
+    public private(set) var purchaseTypeId:Int
     
-    private var creationDate:Date?
+    public private(set) var creationDate:Date?
     
     init(id:Int, purchaseTypeId:Int) {
         self.id = id

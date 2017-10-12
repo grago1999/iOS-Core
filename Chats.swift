@@ -10,8 +10,8 @@ import Foundation
 
 class Chats {
     
-    static func get(chatId:Int, completionHandler: @escaping (Bool, String, Chat) -> Void) {
-       Connection.request(path:"/base/api/v1/chat/get", post:["chatId":String(chatId)], completionHandler: { res in
+    static func get(id:Int, completionHandler: @escaping (Bool, String, Chat) -> Void) {
+       Connection.request(path:"/base/api/v1/chat/get", post:["chatId":String(id)], completionHandler: { res in
             var chat:Chat = Chat()
             if res.success {
                 let chatTitle:String = res.data["chat"]["title"].stringValue
@@ -20,11 +20,11 @@ class Chats {
                 for msgArray in msgArrays {
                     Users.get(id:msgArray["userId"].intValue, completionHandler: { success, msg, user in
                         if success {
-                            chat.add(msg:Message(id:msgArray["id"].intValue, user:user, msg:msgArray["msg"].stringValue))
+                            chat.add(msg:Message(id:msgArray["id"].intValue, user:user!, msg:msgArray["msg"].stringValue))
                         }
                     })
                 }
-                chat = Chat(id:chatId, title:chatTitle, creationDate:chatCreationDate)
+                chat = Chat(id:id, title:chatTitle, creationDate:chatCreationDate)
             }
             completionHandler(res.success, res.msg, chat)
         })

@@ -10,24 +10,17 @@ import Foundation
 
 class User {
     
-    private var id:Int
-    private var username:String
-    private var banned:Bool
-    private var privacy:Int
-    private var creationDate:Date?
+    public private(set) var id:Int
+    public private(set) var username:String
+    public private(set) var banned:Bool
+    public private(set) var privacy:Int
+    public private(set) var creationDate:Date?
     
     init(id:Int, username:String, banned:Bool, privacy:Int) {
         self.id = id
         self.username = username
         self.banned = banned
         self.privacy = privacy
-    }
-    
-    init() {
-        self.id = 0
-        self.username = ""
-        self.banned = false
-        self.privacy = 0
     }
     
     func update(privacy:Int, completionHandler: @escaping (Bool, String) -> Void) {
@@ -38,22 +31,6 @@ class User {
             }
             completionHandler(res.success, res.msg)
         })
-    }
-    
-    func getId() -> Int {
-        return id
-    }
-
-    func getUsername() -> String {
-        return username
-    }
-    
-    func isBanned() -> Bool {
-        return banned
-    }
-    
-    func getPrivacy() -> Int {
-        return privacy
     }
     
 }

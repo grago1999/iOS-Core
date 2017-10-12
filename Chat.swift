@@ -10,10 +10,10 @@ import Foundation
 
 class Chat {
 
-    private var id:Int
-    private var title:String
-    private var creationDate:Date?
-    private var msgs:[Message] = []
+    public private(set) var id:Int
+    public private(set) var title:String
+    public private(set) var creationDate:Date?
+    public private(set) var msgs:[Message] = []
     
     init(id:Int, title:String, creationDate:Date) {
         self.id = id
@@ -26,18 +26,10 @@ class Chat {
         self.title = ""
     }
     
-    func getId() -> Int {
-        return id
-    }
-    
-    func getTitle() -> String {
-        return title
-    }
-    
     func add(msg:Message) {
         var shouldAddMsg:Bool = true
         for currentMsg in self.msgs {
-            if currentMsg.getId() == msg.getId() {
+            if currentMsg.id == msg.id {
                 shouldAddMsg = false
                 break
             }

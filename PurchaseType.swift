@@ -10,16 +10,16 @@ import Foundation
 
 class PurchaseType {
 
-    private var id:Int
-    private var productId:String
+    public private(set) var id:Int
+    public private(set) var productId:String
     
-    private var title:String
-    private var description:String
+    public private(set) var title:String
+    public private(set) var description:String
     
-    private var price:Double
-    private var imgName:String
+    public private(set) var price:Double
+    public private(set) var imgName:String
     
-    private var creationDate:Date?
+    public private(set) var creationDate:Date?
     
     init(id:Int, productId:String, title:String, description:String, price:Double, imgName:String) {
         self.id = id
@@ -28,22 +28,6 @@ class PurchaseType {
         self.description = description
         self.price = price
         self.imgName = imgName
-    }
-    
-    func getId() -> Int {
-        return id
-    }
-    
-    func getTitle() -> String {
-        return title
-    }
-    
-    func getDescription() -> String {
-        return description
-    }
-
-    func getProductId() -> String {
-        return productId
     }
     
 }

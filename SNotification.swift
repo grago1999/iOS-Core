@@ -8,32 +8,14 @@
 
 class SNotification {
 
-    private var id:String
-    private var title:String
-    private var msg:String
+    public private(set) var id:String
+    public private(set) var title:String
+    public private(set) var msg:String
     
     init(id:String, title:String, msg:String) {
         self.id = id
         self.title = title
         self.msg = msg
-    }
-    
-    init() {
-        self.id = ""
-        self.title = ""
-        self.msg = ""
-    }
-    
-    func getId() -> String {
-        return id
-    }
-    
-    func getTitle() -> String {
-        return title
-    }
-    
-    func getMsg() -> String {
-        return msg
     }
     
 }

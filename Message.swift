@@ -10,27 +10,15 @@ import Foundation
 
 class Message {
     
-    private var id:Int
-    private var user:User
-    private var msg:String
-    private var creationDate:Date?
+    public private(set) var id:Int
+    public private(set) var user:User
+    public private(set) var msg:String
+    public private(set) var creationDate:Date?
     
     init(id:Int, user:User, msg:String) {
         self.id = id
         self.user = user
         self.msg = msg
-    }
-    
-    func getId() -> Int {
-        return id
-    }
-    
-    func getMsg() -> String {
-        return msg
-    }
-    
-    func getUser() -> User {
-        return user
     }
 
 }

@@ -96,13 +96,20 @@ class Common {
     }
 
     static func reset() {
-        Settings.set(value:false, key:.hasOpenedApp)
-        Settings.set(value:false, key:.hasPromptedNotifications)
-        Settings.set(value:false, key:.doesAllowNotifications)
-        Settings.set(value:false, key:.needsToUpdatePassword)
-        Settings.set(value:false, key:.hasSignedInWithEmail)
-        Settings.set(value:false, key:.hasSignedInWithGoogle)
-        Settings.set(value:false, key:.hasSignedInWithFacebook)
+        for item in iterateEnum(Config.Key.self) {
+            Settings.set(value:false, key:item)
+        }
+    }
+    
+    // https://stackoverflow.com/questions/24007461/how-to-enumerate-an-enum-with-string-type
+    static func iterateEnum<T: Hashable>(_: T.Type) -> AnyIterator<T> {
+        var i = 0
+        return AnyIterator {
+            let next = withUnsafeBytes(of: &i) { $0.load(as: T.self) }
+            if next.hashValue != i { return nil }
+            i += 1
+            return next
+        }
     }
     
     static func log(prefix:LogType, str:String) {

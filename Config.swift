@@ -19,5 +19,14 @@ class Config {
     static let analyticsUrl = dev ? "http://localhost" : "https://google.com"
     
     static let appId:Int64 = 987654321
+    
+    enum Key:String {
+        case hasOpenedApp = "has-opened-app"
+        case hasPromptedNotifications = "has-prompted-notifications"
+        case doesAllowNotifications = "does-allow-notifications"
+        case needsToUpdatePassword = "needs-to-update-password"
+        case hasSignedInWithEmail = "has-signed-in-with-email"
+        case hasPromptedLocationSerivces = "has-prompted-location-services"
+    }
 
 }

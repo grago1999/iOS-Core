@@ -10,7 +10,7 @@ import UIKit
 
 class SView: UIView {
     
-    private var id:String
+    public private(set) var id:String
     
     init(frame:CGRect, id:String) {
         self.id = id
@@ -45,10 +45,6 @@ class SView: UIView {
             Common.isLoading = false
             self.removeFromSuperview()
         })
-    }
-    
-    func getId() -> String {
-        return id
     }
     
     required init?(coder aDecoder: NSCoder) {

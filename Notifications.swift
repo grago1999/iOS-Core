@@ -16,10 +16,6 @@ class Notifications {
         queue.append(notifcation)
     }
     
-    static func getFirst() -> SNotification {
-        return has() ? queue.first! : SNotification()
-    }
-    
     static func remove(id:String) {
         let check = exists(id:id)
         if check.0 {
@@ -32,7 +28,7 @@ class Notifications {
         var i:Int = 0
         if has() {
             for notification in queue {
-                if notification.getId() == id {
+                if notification.id == id {
                     exists = true
                     break
                 }

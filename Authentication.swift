@@ -16,8 +16,7 @@ class Authentication {
                 Common.log(prefix:.debug, str:"Login \(res.success)")
                 if res.success {
                     if validate(client:res.data) {
-                        Users.main = Users.to(from:res.data)
-                        Users.addRetrieved(user:Users.main!)
+                        Users.set(main:Users.to(from:res.data))
                         let hasEmailSaved:Bool = Secure.add(value:email, key:"email")
                         let hasPSaved:Bool = Secure.add(value:p, key:"p")
                         if hasEmailSaved && hasPSaved {
@@ -43,10 +42,9 @@ class Authentication {
         Connection.request(path:"/base/api/v1/includes/register", post:["email":email, "p":Common.hash(str:p), "client":"0", "locale":"en"], completionHandler: { res in
             if res.success {
                 if validate(client:res.data) {
-                    Users.main = Users.to(from:res.data)
-                    Users.addRetrieved(user:Users.main!)
+                    Users.set(main:Users.to(from:res.data))
                     Settings.set(value:true, key:.hasSignedInWithEmail)
-                    Common.log(prefix:.debug, str:"Register \(res.success) as \(Users.main!.getUsername())")
+                    Common.log(prefix:.debug, str:"Register \(res.success) as \(Users.main!.username)")
                     let hasEmailSaved:Bool = Secure.add(value:email, key:"email")
                     let hasPSaved:Bool = Secure.add(value:p, key:"p")
                     if hasEmailSaved && hasPSaved {
