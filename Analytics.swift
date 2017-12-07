@@ -17,8 +17,8 @@ class Analytics {
         if let actionElementId = elementId {
             post["elementId"] = actionElementId
         }
-        Connection.request(baseUrl:Config.analyticsUrl, path:"/analytics/api/v1/report", post:post, completionHandler: { res in
-            Common.log(prefix:.debug, str:res.msg)
+        Connection.request(baseUrl:Config.analyticsUrl, path:"/analytics/api/v1/report", post:post, completion: { res in
+            Common.log(prefix:.debug, str:res.message)
         })
     }
     

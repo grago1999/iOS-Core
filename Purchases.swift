@@ -7,15 +7,15 @@
 //
 class Purchases {
     
-    static func add(purchaseTypeId:Int, completionHandler: @escaping (Bool, String) -> Void) {
-        Connection.request(path:"/base/api/v1/user/addPurchase", post:["purchaseTypeId":String(purchaseTypeId)], completionHandler: {
+    static func add(purchaseTypeId:Int, completion: @escaping (Bool, String) -> Void) {
+        Connection.request(path:"/base/api/v1/user/addPurchase", post:["purchaseTypeId":String(purchaseTypeId)], completion: {
             res in
-            completionHandler(res.success, res.msg)
+            completion(res.success, res.message)
         })
     }
     
-    static func get(completionHandler: @escaping (Bool, String, [Purchase]) -> Void) {
-        Connection.request(path:"/base/api/v1/user/getPurchases", post:[:], completionHandler: {
+    static func get(completion: @escaping (Bool, String, [Purchase]) -> Void) {
+        Connection.request(path:"/base/api/v1/user/getPurchases", post:[:], completion: {
             res in
             var purchases:[Purchase] = []
             let purchaseArr = res.data["purchases"].arrayValue
@@ -25,12 +25,12 @@ class Purchases {
                 let purchase = Purchase(id:purchaseId, purchaseTypeId:purchaseTypeId)
                 purchases.append(purchase)
             }
-            completionHandler(res.success, res.msg, purchases)
+            completion(res.success, res.message, purchases)
         })
     }
     
-    static func getStore(completionHandler: @escaping (Bool, String, [PurchaseType]) -> Void) {
-        Connection.request(path:"/base/api/v1/store/get", post:[:], completionHandler: {
+    static func getStore(completion: @escaping (Bool, String, [PurchaseType]) -> Void) {
+        Connection.request(path:"/base/api/v1/store/get", post:[:], completion: {
             res in
             var purchaseTypes:[PurchaseType] = []
             let purchaseTypesArr = res.data["purchaseTypes"].arrayValue
@@ -44,7 +44,7 @@ class Purchases {
                 let purchaseType = PurchaseType(id:purchaseTypeId, productId:productId, title:title, description:description, price:Double(priceUSD)/100.0, imgName:imgName)
                 purchaseTypes.append(purchaseType)
             }
-            completionHandler(res.success, res.msg, purchaseTypes)
+            completion(res.success, res.message, purchaseTypes)
         })
     }
 

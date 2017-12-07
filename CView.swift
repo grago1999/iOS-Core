@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SView: UIView {
+class CView: UIView {
     
     public private(set) var id:String
     

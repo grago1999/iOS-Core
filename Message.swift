@@ -12,13 +12,14 @@ class Message {
     
     public private(set) var id:Int
     public private(set) var user:User
-    public private(set) var msg:String
-    public private(set) var creationDate:Date?
+    public private(set) var text:String
+    public private(set) var creationDate:Date
     
-    init(id:Int, user:User, msg:String) {
+    init(id:Int, user:User, text:String, creationDate:Date) {
         self.id = id
         self.user = user
-        self.msg = msg
+        self.text = text
+        self.creationDate = creationDate
     }
 
 }

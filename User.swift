@@ -11,25 +11,26 @@ import Foundation
 class User {
     
     public private(set) var id:Int
-    public private(set) var username:String
+    public private(set) var name:String
     public private(set) var banned:Bool
     public private(set) var privacy:Int
-    public private(set) var creationDate:Date?
+    public private(set) var creationDate:Date
     
-    init(id:Int, username:String, banned:Bool, privacy:Int) {
+    init(id:Int, name:String, banned:Bool, privacy:Int, creationDate:Date) {
         self.id = id
-        self.username = username
+        self.name = name
         self.banned = banned
         self.privacy = privacy
+        self.creationDate = creationDate
     }
     
-    func update(privacy:Int, completionHandler: @escaping (Bool, String) -> Void) {
-        Connection.request(path:"/base/api/v1/user/updatePrivacy", post:["privacy":String(privacy)], completionHandler: {
+    func update(privacy:Int, completion: @escaping (Bool, Int, String) -> Void) {
+        Connection.request(path:"/api/v1/user/update", post:["privacy":String(privacy)], completion: {
             res in
             if res.success {
                 self.privacy = privacy
             }
-            completionHandler(res.success, res.msg)
+            completion(res.success, res.code, res.message)
         })
     }
     

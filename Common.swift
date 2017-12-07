@@ -20,9 +20,6 @@ class Common {
     static let alphabet:String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     static let maxChars:Int = 250
     
-    static var launchOptions:[UIApplicationLaunchOptionsKey:Any]?
-    static var currentVc:UIViewController?
-    
     static var globalMessages:[GlobalMessage] = []
     
     static let delay:Double = 2.0

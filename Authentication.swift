@@ -10,13 +10,13 @@ import SwiftyJSON
 
 class Authentication {
     
-    static func login(email:String, p:String, completionHandler: @escaping (Bool, String) -> Void) {
+    static func login(email:String, p:String, completion: @escaping (Bool, Int, String) -> Void) {
         if Connection.prepared {
-            Connection.request(path:"/base/api/v1/includes/login", post:["email":email, "p":Common.hash(str:p), "client":"0", "locale":"en"], completionHandler: { res in
+            Connection.request(path:"/api/v1/auth/login", post:["email":email, "p":Common.hash(str:p), "client":"0", "locale":"en"], completion: { res in
                 Common.log(prefix:.debug, str:"Login \(res.success)")
                 if res.success {
                     if validate(client:res.data) {
-                        Users.set(main:Users.to(from:res.data))
+                        Users.set(main:Users.to(from:res.data["user"]))
                         let hasEmailSaved:Bool = Secure.add(value:email, key:"email")
                         let hasPSaved:Bool = Secure.add(value:p, key:"p")
                         if hasEmailSaved && hasPSaved {
@@ -24,27 +24,27 @@ class Authentication {
                         }
                     } else {
                         Common.log(prefix:.debug, str:"Invalid client")
-                        completionHandler(false, res.msg)
+                        completion(false, res.code, res.message)
                     }
                 }
-                completionHandler(res.success, res.msg)
+                completion(res.success, res.code, res.message)
             })
         } else {
             Common.attemptLater(fromNow:0.2, attempt: {
-                login(email:email, p:p, completionHandler: { success, msg in
-                    completionHandler(success, msg)
+                login(email:email, p:p, completion: { success, code, message in
+                    completion(success, code, message)
                 })
             })
         }
     }
     
-    static func register(email:String, p:String, completionHandler: @escaping (Bool, String) -> Void) {
-        Connection.request(path:"/base/api/v1/includes/register", post:["email":email, "p":Common.hash(str:p), "client":"0", "locale":"en"], completionHandler: { res in
+    static func signUp(email:String, p:String, completion: @escaping (Bool, String) -> Void) {
+        Connection.request(path:"/api/v1/auth/signup", post:["email":email, "p":Common.hash(str:p), "client":"0", "locale":"en"], completion: { res in
             if res.success {
                 if validate(client:res.data) {
                     Users.set(main:Users.to(from:res.data))
                     Settings.set(value:true, key:.hasSignedInWithEmail)
-                    Common.log(prefix:.debug, str:"Register \(res.success) as \(Users.main!.username)")
+                    Common.log(prefix:.debug, str:"Register \(res.success) as \(Users.main!.name)")
                     let hasEmailSaved:Bool = Secure.add(value:email, key:"email")
                     let hasPSaved:Bool = Secure.add(value:p, key:"p")
                     if hasEmailSaved && hasPSaved {
@@ -52,31 +52,31 @@ class Authentication {
                     }
                 } else {
                     Common.log(prefix:.debug, str:"Invalid client")
-                    completionHandler(false, res.msg)
+                    completion(false, res.message)
                 }
             } else {
                 Common.log(prefix:.debug, str:"Login \(res.success)")
             }
-            completionHandler(res.success, res.msg)
+            completion(res.success, res.message)
         })
     }
     
-    static func update(p:String, completionHandler: @escaping (Bool, String) -> Void) {
+    static func update(p:String, completion: @escaping (Bool, String) -> Void) {
         let hashedP = Common.hash(str:p)
-        Connection.request(path:"/base/api/v1/user/updatePassword", post:["p":hashedP], completionHandler: {
+        Connection.request(path:"/api/v1/auth/update", post:["p":hashedP], completion: {
             res in
             if res.success {
                 Settings.set(value:true, key:.needsToUpdatePassword)
                 let hasPSaved:Bool = Secure.add(value:hashedP, key:"p")
                 if hasPSaved {
                     Common.log(prefix:.debug, str:"New password ready")
-                    completionHandler(true, res.msg)
+                    completion(true, res.message)
                 } else {
                     Common.log(prefix:.error, str:"Could not handle password locally")
-                    completionHandler(false, "Could not handle password locally")
+                    completion(false, "Could not handle password locally")
                 }
             }
-            completionHandler(res.success, res.msg)
+            completion(res.success, res.message)
         })
     }
     
@@ -103,8 +103,8 @@ class Authentication {
     
     static func validate(client:JSON) -> Bool {
         Common.globalMessages = []
-        let retrievedClientVersion:String = client["data"]["clientVersion"].stringValue
-        let retrievedGlobalMessages:[JSON] = client["data"]["globalMessages"].arrayValue
+        let retrievedClientVersion:String = client["clientVersion"].stringValue
+        let retrievedGlobalMessages:[JSON] = client["globalMessages"].arrayValue
         for retrievedGlobalMessage in retrievedGlobalMessages {
             let globalMessage:GlobalMessage = GlobalMessage(id:retrievedGlobalMessage["id"].intValue, title:retrievedGlobalMessage["title"].stringValue, description:retrievedGlobalMessage["description"].stringValue, imgName:retrievedGlobalMessage["imgName"].stringValue, shouldStop:retrievedGlobalMessage["shouldStop"].boolValue)
             Common.globalMessages.append(globalMessage)

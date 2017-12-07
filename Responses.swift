@@ -12,18 +12,20 @@ class Responses {
     
     private static let general:JSON = [
         "success": true,
-        "msg": "Successfully faked response",
+        "code": 1,
+        "message": "Successfully faked response",
     ]
     private static let error:JSON = [
         "success": false,
-        "msg": "Failed to fake response",
+        "code": 99,
+        "message": "Failed to fake response",
     ]
     
     private static var all:[String:JSON] = [:]
     
-    static func addFake(path:String, data:JSON) {
+    static func addFake(path:String, data:JSON? = []) {
         var response:JSON = general
-        response["data"] = data
+        response["data"] = data!
         if all[path] == nil {
             all[path] = response
         }

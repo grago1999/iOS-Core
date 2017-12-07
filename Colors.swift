@@ -20,5 +20,6 @@ class Colors {
     static let lightGray:UIColor = UIColor(red:56.0/255.0, green:59.0/255.0, blue:64.0/255.0, alpha:1.0)
     static let gray:UIColor = UIColor(red:41.0/255.0, green:44.0/255.0, blue:47.0/255.0, alpha:1.0)
     static let white:UIColor = UIColor(red:255.0/255.0, green:250.0/255.0, blue:250.0/255.0, alpha:1.0)
+    static let dustyOscarSupreme:UIColor = UIColor(red:147.0/255.0, green:213.0/255.0, blue:54.0/255.0, alpha:1.0)
     
 }

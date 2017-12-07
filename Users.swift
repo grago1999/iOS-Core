@@ -13,9 +13,9 @@ class Users {
     public private(set) static var main:User?
     private static var retrieved:[Int:User] = [:]
     
-    private static func getNonMain(users:[User]) -> User? {
+    private static func getNonMain(from:[User]) -> User? {
         if main != nil {
-            for tempUser in users {
+            for tempUser in from {
                 if tempUser.id != main!.id {
                     return tempUser
                 }
@@ -25,6 +25,7 @@ class Users {
     }
     
     static func set(main:User) {
+        print(main)
         if self.main == nil {
             self.main = main
             addRetrieved(user:main)
@@ -35,64 +36,65 @@ class Users {
         retrieved[user.id] = user
     }
 
-    static func get(id:Int, completionHandler: @escaping (Bool, String, User?) -> Void) {
+    static func get(id:Int, completion: @escaping (Bool, Int, String, User?) -> Void) {
         if let user = retrieved[id] {
-            completionHandler(true, "Found local user successfully", user)
+            completion(true, 0, "Found local user successfully", user)
         }
-        Connection.request(path:"/base/api/v1/user/get", post:["userId":String(id)], completionHandler: { res in
+        Connection.request(path:"/base/api/v1/user/get", post:["userId":String(id)], completion: { res in
             if res.success {
-                completionHandler(res.success, res.msg, to(from:res.data))
+                completion(res.success, res.code, res.message, to(from:res.data))
             }
-            completionHandler(res.success, res.msg, nil)
+            completion(res.success, res.code, res.message, nil)
         })
     }
     
-    static func search(text:String, completionHandler: @escaping (Bool, String, [User]) -> Void) {
-        Connection.request(path:"/base/api/v1/user/search", post:["text":text], completionHandler: { res in
+    static func search(text:String, completion: @escaping (Bool, Int, String, [User]) -> Void) {
+        Connection.request(path:"/base/api/v1/user/search", post:["text":text], completion: { res in
             var users:[User] = []
             let results = res.data["users"].arrayValue
             for result in results {
                 users.append(to(from:result))
             }
-            users.sort(by: { $0.username > $1.username })
-            completionHandler(res.success, res.msg, users)
+            users.sort(by: { $0.name > $1.name })
+            completion(res.success, res.code, res.message, users)
         })
     }
     
-    static func commend(user:User, completionHandler: @escaping (Bool, String) -> Void) {
-        Connection.request(path:"/base/api/v1/user/commend", post:["userId":String(user.id)], completionHandler: {
+    static func commend(user:User, completion: @escaping (Bool, String) -> Void) {
+        Connection.request(path:"/base/api/v1/user/commend", post:["userId":String(user.id)], completion: {
             res in
-            completionHandler(res.success, res.msg)
+            completion(res.success, res.message)
         })
     }
     
-    static func block(user:User, completionHandler: @escaping (Bool, String) -> Void) {
-        Connection.request(path:"/base/api/v1/user/block", post:["userId":String(user.id)], completionHandler: {
+    static func block(user:User, completion: @escaping (Bool, String) -> Void) {
+        Connection.request(path:"/base/api/v1/user/block", post:["userId":String(user.id)], completion: {
             res in
-            completionHandler(res.success, res.msg)
+            completion(res.success, res.message)
         })
     }
     
-    static func unblock(user:User, completionHandler: @escaping (Bool, String) -> Void) {
-        Connection.request(path:"/base/api/v1/user/unblock", post:["userId":String(user.id)], completionHandler: {
+    static func unblock(user:User, completion: @escaping (Bool, String) -> Void) {
+        Connection.request(path:"/base/api/v1/user/unblock", post:["userId":String(user.id)], completion: {
             res in
-            completionHandler(res.success, res.msg)
+            completion(res.success, res.message)
         })
     }
     
-    static func report(user:User, completionHandler: @escaping (Bool, String) -> Void) {
-        Connection.request(path:"/base/api/v1/user/report", post:["userId":String(user.id)], completionHandler: {
+    static func report(user:User, completion: @escaping (Bool, String) -> Void) {
+        Connection.request(path:"/base/api/v1/user/report", post:["userId":String(user.id)], completion: {
             res in
-            completionHandler(res.success, res.msg)
+            completion(res.success, res.message)
         })
     }
     
     static func to(from:JSON) -> User {
-        let userId:Int = from["user"]["id"].intValue
-        let username:String = from["user"]["username"].stringValue
-        let banned:Bool = from["user"]["banned"].boolValue
-        let privacy = from["user"]["privacy"].intValue
-        let user:User = User(id:userId, username:username, banned:banned, privacy:privacy)
+        let userId:Int = from["id"].intValue
+        let name:String = from["name"].stringValue
+        let banned:Bool = from["banned"].boolValue
+        let privacy:Int = from["privacy"].intValue
+        let creationDate:Date = Dates.from(str:from["creationDate"].stringValue)
+        let user:User = User(id:userId, name:name, banned:banned, privacy:privacy, creationDate:creationDate)
         addRetrieved(user:user)
         return user
     }

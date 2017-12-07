@@ -19,52 +19,56 @@ class Connection {
     private static var session:URLSession?
     
     static func prepare() {
-        if !prepared && !Config.dev && !Config.fake {
-            if reachability.currentReachabilityStatus == .notReachable {
-                Common.attemptLater(fromNow:2, attempt: {
-                    Connection.prepare()
-                })
+        if !prepared {
+            if Config.dev && Config.fake {
+                prepared = true
             } else {
-                session = URLSession(configuration:config)
-                Connection.status(completionHandler: { res, status in
-                    Common.log(prefix:.debug, str:"Status: \(status) with success: \(res.success) and msg: \(res.msg)")
-                    if res.success {
-                        if status {
-                            Connection.prepared = true
+                if reachability.currentReachabilityStatus == .notReachable {
+                    Common.attemptLater(fromNow:2, attempt: {
+                        Connection.prepare()
+                    })
+                } else {
+                    session = URLSession(configuration:config)
+                    Connection.status(completion: { res, status in
+                        Common.log(prefix:.debug, str:"Status: \(status) with success: \(res.success) and message: \(res.message)")
+                        if res.success {
+                            if status {
+                                Connection.prepared = true
+                            } else {
+                                Common.attemptLater(fromNow:2, attempt: {
+                                    Connection.prepare()
+                                })
+                            }
                         } else {
                             Common.attemptLater(fromNow:2, attempt: {
                                 Connection.prepare()
                             })
                         }
-                    } else {
-                        Common.attemptLater(fromNow:2, attempt: {
-                            Connection.prepare()
-                        })
-                    }
-                })
+                    })
+                }
             }
         }
     }
     
-    private static func status(completionHandler: @escaping (Response, Bool) -> Void) {
-        request(path:"/base/api/v1/status", post:[:], completionHandler: { res in
+    private static func status(completion: @escaping (Response, Bool) -> Void) {
+        request(path:"/base/api/v1/status", post:[:], completion: { res in
             var status:Bool = false
             if res.success {
                 status = res.data["status"].boolValue
             }
-            completionHandler(res, status)
+            completion(res, status)
         })
     }
     
-    static func request(baseUrl:String? = nil, path:String, post:[String:String], completionHandler: @escaping (Response) -> Void) {
+    static func request(baseUrl:String? = nil, path:String, post:[String:String], completion: @escaping (Response) -> Void) {
         var base:String = Config.url
         if baseUrl != nil {
             base = baseUrl!
         }
         if reachability.currentReachabilityStatus == .notReachable {
             Common.attemptLater(fromNow:1, attempt: {
-                request(path:path, post:post, completionHandler: { res in
-                    completionHandler(res)
+                request(path:path, post:post, completion: { res in
+                    completion(res)
                 })
             })
         } else {
@@ -73,9 +77,9 @@ class Connection {
                 return
             }
             if Config.dev && Config.fake {
-                DispatchQueue.global(qos:.background).async {
+                DispatchQueue.main.async {
                     let response = Responses.rand(path:path)
-                    completionHandler(Response(url:baseUrl!+path, success:response["success"].boolValue, msg:response["msg"].stringValue, data:response["data"]))
+                    completion(Response(url:"faked"+path, success:response["success"].boolValue, code:response["code"].intValue, message:response["message"].stringValue, data:response["data"]))
                 }
             } else {
                 var postStr:String = ""
@@ -93,25 +97,21 @@ class Connection {
                 var urlRequest = URLRequest(url:url)
                 urlRequest.httpMethod = "POST"
                 urlRequest.httpBody = postStr.data(using:String.Encoding.utf8)
-                let task = session?.dataTask(with: urlRequest, completionHandler: { (data, response, error) in
-                    var msg:String = ""
+                let task = session?.dataTask(with: urlRequest, completionHandler: { data, response, error in
                     if error == nil {
                         let json = JSON(data:data!)
                         let success:Bool = json["success"].boolValue
-                        if let oldMsg = json["msg"].string {
-                            msg = oldMsg
-                        } else {
-                            msg = json["msg"]["msg"].stringValue
-                        }
-                        Common.log(prefix:.debug, str:"Request to \(base+path) with success: \(success) with message: \(msg)")
-                        if msg == "Not logged in" {
+                        let code:Int = json["code"].intValue
+                        let message:String = json["message"].stringValue
+                        Common.log(prefix:.debug, str:"Request to \(base+path) with success: \(success) with message: \(message)")
+                        if message == "Not logged in" {
                             Common.attemptLater(fromNow:1, attempt: {
-                                request(path:path, post:post, completionHandler: { res in
-                                    completionHandler(Response(url:baseUrl!+path, success:success, msg:msg, data:json["data"]))
+                                request(path:path, post:post, completion: { res in
+                                    completion(Response(url:baseUrl!+path, success:success, code:code, message:message, data:json["data"]))
                                 })
                             })
                         } else {
-                            completionHandler(Response(url:baseUrl!+path, success:success, msg:msg, data:json["data"]))
+                            completion(Response(url:baseUrl!+path, success:success, code:code, message:message, data:json["data"]))
                         }
                     } else {
                         Common.log(prefix:.error, str:error.debugDescription)

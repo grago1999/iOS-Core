@@ -10,12 +10,12 @@ class SNotification {
 
     public private(set) var id:String
     public private(set) var title:String
-    public private(set) var msg:String
+    public private(set) var message:String
     
-    init(id:String, title:String, msg:String) {
+    init(id:String, title:String, message:String) {
         self.id = id
         self.title = title
-        self.msg = msg
+        self.message = message
     }
     
 }

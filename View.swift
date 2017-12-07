@@ -31,7 +31,7 @@ class View {
     
     struct RoundButton {
         static let size:CGSize = CGSize(width:45.0, height:45.0)
-        static let cornerRadius:CGFloat = 5.0
+        static let cornerRadius:CGFloat = 45.0/2
         static let borderWidth:CGFloat = 2.0
     }
     
@@ -80,13 +80,13 @@ class View {
         static let indicatorSize:CGSize = CGSize(width:14.0, height:14.0)
     }
     
-    static var loadingView:SView?
+    static var loadingView:CView?
     
     static func showLoadingView(toView:UIView) {
         let duration:Double = Animation.duration*4
         let radius:CGFloat = 35.0
         Common.isLoading = true
-        loadingView = SView(frame:CGRect(x:0, y:0, width:toView.frame.size.width, height:toView.frame.size.height), id:"loading-view")
+        loadingView = CView(frame:CGRect(x:0, y:0, width:toView.frame.size.width, height:toView.frame.size.height), id:"loading-view")
         loadingView!.backgroundColor = Colors.gray
         loadingView!.layer.zPosition = 100
         loadingView!.isUserInteractionEnabled = false
@@ -129,6 +129,14 @@ class View {
         animate()
         
         toView.addSubview(loadingView!)
+    }
+    
+    static func pop(on:UIViewController, code:Int, message:String) {
+        DispatchQueue.main.async {
+            let storyboard = UIStoryboard(name:"Main", bundle:nil)
+            let vc = storyboard.instantiateViewController(withIdentifier:"PopController") as! PopController
+            on.present(vc, animated:false, completion:nil)
+        }
     }
 
 }
