@@ -51,28 +51,56 @@ class Connection {
     }
     
     private static func status(completion: @escaping (Response, Bool) -> Void) {
-        request(path:"/base/api/v1/status", post:[:], completion: { res in
+        request(path:"/api/v1/status", get:[:]) { res in
             var status:Bool = false
             if res.success {
-                status = res.data["status"].boolValue
+                status = res.data!["status"].stringValue == "ok"
             }
             completion(res, status)
-        })
+        }
+    }
+    
+    static func request(baseUrl:String? = nil, path:String, get:[String:String], completion: @escaping (Response) -> Void) {
+        request(baseUrl:baseUrl, path:path, send:get, method:"GET") { response in
+            completion(response)
+        }
     }
     
     static func request(baseUrl:String? = nil, path:String, post:[String:String], completion: @escaping (Response) -> Void) {
+        request(baseUrl:baseUrl, path:path, send:post, method:"POST") { response in
+            completion(response)
+        }
+    }
+    
+    private static func request(baseUrl:String? = nil, path:String, send:[String:String], method:String, completion: @escaping (Response) -> Void) {
         var base:String = Config.url
         if baseUrl != nil {
             base = baseUrl!
         }
         if reachability.currentReachabilityStatus == .notReachable {
             Common.attemptLater(fromNow:1, attempt: {
-                request(path:path, post:post, completion: { res in
+                request(path:path, send:send, method:method, completion: { res in
                     completion(res)
                 })
             })
         } else {
-            guard let url = URL(string:base+path) else {
+            var sendStr:String = ""
+            var isFirst:Bool = true
+            for key in send.keys {
+                var val:String = ""
+                if isFirst {
+                    isFirst = false
+                } else {
+                    val += "&"
+                }
+                val += key+"="+send[key]!
+                sendStr += val
+            }
+            var urlStr:String = base+path
+            if method == "GET" {
+                urlStr += "?"+sendStr
+            }
+            guard let url = URL(string:urlStr) else {
                 Common.log(prefix:.error, str:"Could not create URL")
                 return
             }
@@ -82,21 +110,13 @@ class Connection {
                     completion(Response(url:"faked"+path, success:response["success"].boolValue, code:response["code"].intValue, message:response["message"].stringValue, data:response["data"]))
                 }
             } else {
-                var postStr:String = ""
-                var isFirst:Bool = true
-                for key in post.keys {
-                    var val:String = ""
-                    if isFirst {
-                        isFirst = false
-                    } else {
-                        val += "&"
-                    }
-                    val += key+"="+post[key]!
-                    postStr += val
-                }
                 var urlRequest = URLRequest(url:url)
-                urlRequest.httpMethod = "POST"
-                urlRequest.httpBody = postStr.data(using:String.Encoding.utf8)
+                urlRequest.timeoutInterval = 10
+                urlRequest.setValue(Config.origin, forHTTPHeaderField:"origin")
+                urlRequest.httpMethod = method
+                if method == "POST" {
+                    urlRequest.httpBody = sendStr.data(using:String.Encoding.utf8)
+                }
                 let task = session?.dataTask(with: urlRequest, completionHandler: { data, response, error in
                     if error == nil {
                         let json = JSON(data:data!)
@@ -104,17 +124,10 @@ class Connection {
                         let code:Int = json["code"].intValue
                         let message:String = json["message"].stringValue
                         Common.log(prefix:.debug, str:"Request to \(base+path) with success: \(success) with message: \(message)")
-                        if message == "Not logged in" {
-                            Common.attemptLater(fromNow:1, attempt: {
-                                request(path:path, post:post, completion: { res in
-                                    completion(Response(url:baseUrl!+path, success:success, code:code, message:message, data:json["data"]))
-                                })
-                            })
-                        } else {
-                            completion(Response(url:baseUrl!+path, success:success, code:code, message:message, data:json["data"]))
-                        }
+                        completion(Response(url:base+path, success:success, code:code, message:message, data:json["data"]))
                     } else {
                         Common.log(prefix:.error, str:error.debugDescription)
+                        completion(Response(url:base+path, success:false, code:1000, message:"error"))
                     }
                 })
                 task?.resume()

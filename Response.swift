@@ -13,14 +13,16 @@ class Response {
     public private(set) var success:Bool
     public private(set) var message:String
     public private(set) var code:Int
-    public private(set) var data:JSON
+    public private(set) var data:JSON?
     
-    init(url:String, success:Bool, code:Int, message:String, data:JSON) {
+    init(url:String, success:Bool, code:Int, message:String, data:JSON? = nil) {
         self.url = url
         self.success = success
         self.code = code
         self.message = message
-        self.data = data
+        if data != nil {
+            self.data = data
+        }
     }
     
     init() {
@@ -28,7 +30,6 @@ class Response {
         success = false
         code = 0
         message = ""
-        data = []
     }
     
 }

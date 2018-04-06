@@ -9,7 +9,8 @@ import UIKit
 
 class Fonts {
     
-    static let general:UIFont = UIFont(name:"Avenir-Heavy", size:20.0)!
-    static let title:UIFont = UIFont(name:"Avenir-Heavy", size:28.0)!
+    static let general:UIFont = UIFont(name:"Avenir-Black", size:22.0)!
+    static let title:UIFont = UIFont(name:"Avenir-Black", size:32.0)!
+    static let small:UIFont = UIFont(name:"Avenir-Black", size:14.0)!
 
 }

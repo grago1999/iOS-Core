@@ -12,7 +12,10 @@ class View {
     
     static let width = UIScreen.main.bounds.size.width
     static let height = UIScreen.main.bounds.size.height
-    struct status {
+    static let size = CGSize(width:width, height:height)
+    
+    struct Status {
+        static let size = CGSize(width:UIApplication.shared.statusBarFrame.width, height:UIApplication.shared.statusBarFrame.height)
         static let width = UIApplication.shared.statusBarFrame.width
         static let height = UIApplication.shared.statusBarFrame.height
     }
@@ -27,9 +30,10 @@ class View {
     
     struct Animation {
         static let duration:Double = 0.25
+        static let quickDuration:Double = 0.1
     }
     
-    struct RoundButton {
+    struct SquareButton {
         static let size:CGSize = CGSize(width:45.0, height:45.0)
         static let cornerRadius:CGFloat = 45.0/2
         static let borderWidth:CGFloat = 2.0
@@ -41,14 +45,26 @@ class View {
         static let borderWidth:CGFloat = 2.0
     }
     
+    struct HalfButton {
+        static let size:CGSize = CGSize(width:(width/2)-(margin*2), height:50.0)
+        static let cornerRadius:CGFloat = 5.0
+        static let borderWidth:CGFloat = 2.0
+    }
+    
     struct SmallButton {
-        static let size:CGSize = CGSize(width:120.0, height:32.0)
+        static let size:CGSize = CGSize(width:120.0, height:40.0)
         static let cornerRadius:CGFloat = 5.0
         static let borderWidth:CGFloat = 2.0
     }
     
     struct LongButton {
         static let size:CGSize = CGSize(width:width-(margin*2), height:GeneralButton.size.height)
+        static let cornerRadius:CGFloat = 5.0
+        static let borderWidth:CGFloat = 2.0
+    }
+    
+    struct InlineButton {
+        static let size:CGSize = CGSize(width:GeneralField.size.height-margin, height:GeneralField.size.height-margin)
         static let cornerRadius:CGFloat = 5.0
         static let borderWidth:CGFloat = 2.0
     }
@@ -80,26 +96,24 @@ class View {
         static let indicatorSize:CGSize = CGSize(width:14.0, height:14.0)
     }
     
-    static var loadingView:CView?
-    
-    static func showLoadingView(toView:UIView) {
-        let duration:Double = Animation.duration*4
+    static func createLoadingView(view:UIView) -> CView {
+        let duration:Double = View.Animation.duration*4
         let radius:CGFloat = 35.0
         Common.isLoading = true
-        loadingView = CView(frame:CGRect(x:0, y:0, width:toView.frame.size.width, height:toView.frame.size.height), id:"loading-view")
-        loadingView!.backgroundColor = Colors.gray
-        loadingView!.layer.zPosition = 100
-        loadingView!.isUserInteractionEnabled = false
+        let loadingView = CView(frame:CGRect(origin:.zero, size:view.frame.size), id:"loading-view")
+        loadingView.backgroundColor = Colors.gray.withAlphaComponent(0.2)
+        loadingView.layer.zPosition = 100
+        loadingView.isUserInteractionEnabled = false
         
-        let circlePath = UIBezierPath(arcCenter:CGPoint(x:loadingView!.frame.size.width/2.0, y:loadingView!.frame.size.height/2.0), radius:radius, startAngle:0.0, endAngle:CGFloat(.pi*2.0), clockwise:true)
-        let reverseCirclePath = UIBezierPath(arcCenter:CGPoint(x:loadingView!.frame.size.width/2.0, y:loadingView!.frame.size.height/2.0), radius:radius, startAngle:0.0, endAngle:CGFloat(.pi*2.0), clockwise:false)
+        let circlePath = UIBezierPath(arcCenter:CGPoint(x:loadingView.frame.size.width/2.0, y:loadingView.frame.size.height/2.0), radius:radius, startAngle:0.0, endAngle:CGFloat(.pi*2.0), clockwise:true)
+        let reverseCirclePath = UIBezierPath(arcCenter:CGPoint(x:loadingView.frame.size.width/2.0, y:loadingView.frame.size.height/2.0), radius:radius, startAngle:0.0, endAngle:CGFloat(.pi*2.0), clockwise:false)
         
         let circleLayer = CAShapeLayer()
         circleLayer.fillColor = UIColor.clear.cgColor
         circleLayer.strokeColor = Colors.white.cgColor
         circleLayer.lineWidth = 10.0
         circleLayer.strokeEnd = 0.0
-        loadingView!.layer.addSublayer(circleLayer)
+        loadingView.layer.addSublayer(circleLayer)
         
         func animate() {
             circleLayer.path = circlePath.cgPath
@@ -128,15 +142,7 @@ class View {
         }
         animate()
         
-        toView.addSubview(loadingView!)
+        return loadingView
     }
     
-    static func pop(on:UIViewController, code:Int, message:String) {
-        DispatchQueue.main.async {
-            let storyboard = UIStoryboard(name:"Main", bundle:nil)
-            let vc = storyboard.instantiateViewController(withIdentifier:"PopController") as! PopController
-            on.present(vc, animated:false, completion:nil)
-        }
-    }
-
 }

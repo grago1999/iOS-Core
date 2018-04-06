@@ -11,6 +11,7 @@ import UIKit
 class CView: UIView {
     
     public private(set) var id:String
+    private var loadingView:CView?
     
     init(frame:CGRect, id:String) {
         self.id = id
@@ -38,13 +39,22 @@ class CView: UIView {
         self.layer.shadowOpacity = 0.0
     }
     
-    func hide() {
+    func remove() {
         UIView.animate(withDuration:View.Animation.duration, animations: {
             self.alpha = 0
         }, completion: { done in
-            Common.isLoading = false
             self.removeFromSuperview()
         })
+    }
+    
+    func startLoading() {
+        loadingView = View.createLoadingView(view:self)
+        self.addSubview(loadingView!)
+    }
+    
+    func stopLoading() {
+        Common.isLoading = false
+        loadingView?.remove()
     }
     
     required init?(coder aDecoder: NSCoder) {

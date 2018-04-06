@@ -16,12 +16,22 @@ class CTextView: UITextView {
         self.id = id
         super.init(frame:frame, textContainer:nil)
         self.backgroundColor = .clear
-        self.font = UIFont.systemFont(ofSize:20.0)
+        self.textColor = .white
+        self.font = Fonts.general
     }
     
     init() {
         self.id = ""
         super.init(frame:.zero, textContainer:nil)
+    }
+    
+    func fit() {
+        let fixedWidth = self.frame.size.width
+        self.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
+        let newSize = self.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
+        var newFrame = self.frame
+        newFrame.size = CGSize(width: max(newSize.width, fixedWidth), height: newSize.height)
+        self.frame = newFrame
     }
     
     required init?(coder aDecoder: NSCoder) {

@@ -8,17 +8,17 @@
 class Purchases {
     
     static func add(purchaseTypeId:Int, completion: @escaping (Bool, String) -> Void) {
-        Connection.request(path:"/base/api/v1/user/addPurchase", post:["purchaseTypeId":String(purchaseTypeId)], completion: {
+        Connection.request(path:"/api/v1/user/addPurchase", post:["purchaseTypeId":String(purchaseTypeId)], completion: {
             res in
             completion(res.success, res.message)
         })
     }
     
     static func get(completion: @escaping (Bool, String, [Purchase]) -> Void) {
-        Connection.request(path:"/base/api/v1/user/getPurchases", post:[:], completion: {
+        Connection.request(path:"/api/v1/user/getPurchases", post:[:], completion: {
             res in
             var purchases:[Purchase] = []
-            let purchaseArr = res.data["purchases"].arrayValue
+            let purchaseArr = res.data!["purchases"].arrayValue
             for purchaseJSON in purchaseArr {
                 let purchaseId:Int = purchaseJSON["id"].intValue
                 let purchaseTypeId:Int = purchaseJSON["purchaseTypeId"].intValue
@@ -30,10 +30,10 @@ class Purchases {
     }
     
     static func getStore(completion: @escaping (Bool, String, [PurchaseType]) -> Void) {
-        Connection.request(path:"/base/api/v1/store/get", post:[:], completion: {
+        Connection.request(path:"/api/v1/store/get", post:[:], completion: {
             res in
             var purchaseTypes:[PurchaseType] = []
-            let purchaseTypesArr = res.data["purchaseTypes"].arrayValue
+            let purchaseTypesArr = res.data!["purchaseTypes"].arrayValue
             for purchaseTypeJSON in purchaseTypesArr {
                 let purchaseTypeId:Int = purchaseTypeJSON["typeId"].intValue
                 let productId:String = purchaseTypeJSON["productId"].stringValue

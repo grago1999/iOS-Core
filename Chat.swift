@@ -41,7 +41,7 @@ class Chat {
     }
     
     func send(message:String, completion: @escaping (Bool) -> Void) {
-        Connection.request(path:"/base/api/v1/chat/send", post:["text":message]) { res in
+        Connection.request(path:"/api/v1/chat/send", post:["text":message]) { res in
             completion(res.success)
         }
     }

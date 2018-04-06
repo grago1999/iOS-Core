@@ -10,16 +10,19 @@ import UIKit
 
 class CNavView: CView {
     
-    private var label:CLabel?
+    public private(set) var label:CLabel?
     
     init(id:String) {
-        super.init(frame:CGRect(x:0, y:0, width:View.width, height:View.status.height+View.Nav.size.height), id:id)
-        self.backgroundColor = .white
-        let title:String = LocaleMessages.get(id:id+"-label")
+        super.init(frame:CGRect(x:0, y:0, width:View.width, height:View.Status.height+View.Nav.size.height), id:id)
+        let title:String = LocaleMessages.get(id:id)
         if title != "" {
-            self.label = CLabel(frame:CGRect(x:View.margin, y:View.status.height, width:View.width-View.margin, height:View.Nav.size.height), id:id+"-label")
+            self.label = CLabel(frame:CGRect(x:View.margin, y:View.Status.height, width:View.width-(View.margin*2), height:View.Nav.size.height), id:id)
             self.addSubview(self.label!)
         }
+    }
+    
+    func center() {
+        label?.textAlignment = .center
     }
     
     required init?(coder aDecoder: NSCoder) {

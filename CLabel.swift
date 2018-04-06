@@ -16,12 +16,23 @@ class CLabel: UILabel {
         self.id = id
         super.init(frame:frame)
         self.textAlignment = .left
-        self.font = UIFont.systemFont(ofSize:40.0, weight:.bold)
+        self.font = Fonts.title
         self.text = LocaleMessages.get(id:id)
+        self.textColor = .white
+        self.lineBreakMode = .byWordWrapping
+        self.numberOfLines = 0
     }
     
-    func update(fontSize:CGFloat) {
-        self.font = UIFont.systemFont(ofSize:fontSize, weight:.semibold)
+    func center() {
+        self.textAlignment = .center
+    }
+    
+    func remove() {
+        UIView.animate(withDuration:View.Animation.duration, animations: {
+            self.alpha = 0
+        }, completion: { done in
+            self.removeFromSuperview()
+        })
     }
     
     init() {

@@ -16,6 +16,7 @@ class CButton: UIButton {
         self.id = id
         super.init(frame:frame)
         self.setTitle(LocaleMessages.get(id:id), for:.normal)
+        self.titleLabel?.font = Fonts.general
         self.backgroundColor = .clear
     }
     

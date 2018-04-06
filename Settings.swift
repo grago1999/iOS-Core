@@ -11,7 +11,6 @@ import UIKit
 class Settings {
     
     static func set(value:Bool, key:Config.Key) {
-        Notifications.remove(id:key.rawValue)
         UserDefaults.standard.set(value, forKey:key.rawValue)
     }
     

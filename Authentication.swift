@@ -10,13 +10,13 @@ import SwiftyJSON
 
 class Authentication {
     
-    static func login(email:String, p:String, completion: @escaping (Bool, Int, String) -> Void) {
+    static func login(email:String, p:String, completion: @escaping (Response) -> Void) {
         if Connection.prepared {
-            Connection.request(path:"/api/v1/auth/login", post:["email":email, "p":Common.hash(str:p), "client":"0", "locale":"en"], completion: { res in
+            Connection.request(path:"/api/v1/auth/login", post:["email":email, "p":p, "client":"0", "locale":"en"], completion: { res in
                 Common.log(prefix:.debug, str:"Login \(res.success)")
                 if res.success {
-                    if validate(client:res.data) {
-                        Users.set(main:Users.to(from:res.data["user"]))
+                    if validate(client:res.data!) {
+                        Users.set(main:Users.to(from:res.data!["user"]))
                         let hasEmailSaved:Bool = Secure.add(value:email, key:"email")
                         let hasPSaved:Bool = Secure.add(value:p, key:"p")
                         if hasEmailSaved && hasPSaved {
@@ -24,50 +24,102 @@ class Authentication {
                         }
                     } else {
                         Common.log(prefix:.debug, str:"Invalid client")
-                        completion(false, res.code, res.message)
+                        completion(res)
                     }
                 }
-                completion(res.success, res.code, res.message)
+                completion(res)
             })
         } else {
-            Common.attemptLater(fromNow:0.2, attempt: {
-                login(email:email, p:p, completion: { success, code, message in
-                    completion(success, code, message)
-                })
-            })
+            Common.attemptLater(fromNow:0.2) {
+                login(email:email, p:p) { res in
+                    completion(res)
+                }
+            }
         }
     }
     
-    static func signUp(email:String, p:String, completion: @escaping (Bool, String) -> Void) {
-        Connection.request(path:"/api/v1/auth/signup", post:["email":email, "p":Common.hash(str:p), "client":"0", "locale":"en"], completion: { res in
+    static func login(anonId:String, p:String, completion: @escaping (Response) -> Void) {
+        if Connection.prepared {
+            Connection.request(path:"/api/v1/auth/login", post:["anon_id":anonId, "p":p, "client":"0", "locale":"en"]) { res in
+                Common.log(prefix:.debug, str:"Login \(res.success)")
+                if res.success {
+                    if validate(client:res.data!) {
+                        print(res.data!)
+                        Users.set(main:Users.to(from:res.data!["user"]))
+                        let hasSavedAnonId:Bool = Secure.add(value:anonId, key:"anonId")
+                        let hasPSaved:Bool = Secure.add(value:p, key:"p")
+                        if hasSavedAnonId && hasPSaved {
+                            Settings.set(value:true, key:.hasSignedInAnon)
+                        }
+                    } else {
+                        Common.log(prefix:.debug, str:"Invalid client")
+                        completion(res)
+                    }
+                }
+                completion(res)
+            }
+        } else {
+            Common.attemptLater(fromNow:0.2) {
+                login(anonId:anonId, p:p) { res in
+                    completion(res)
+                }
+            }
+        }
+    }
+    
+    static func signUp(email:String, p:String, completion: @escaping (Response) -> Void) {
+        Connection.request(path:"/api/v1/auth/signup", post:["email":email, "p":p, "client":"0", "locale":"en"]) { res in
             if res.success {
-                if validate(client:res.data) {
-                    Users.set(main:Users.to(from:res.data))
+                if validate(client:res.data!) {
+                    Users.set(main:Users.to(from:res.data!))
                     Settings.set(value:true, key:.hasSignedInWithEmail)
-                    Common.log(prefix:.debug, str:"Register \(res.success) as \(Users.main!.name)")
+                    Common.log(prefix:.debug, str:"Register \(res.success) as \(Users.main!.id)")
                     let hasEmailSaved:Bool = Secure.add(value:email, key:"email")
                     let hasPSaved:Bool = Secure.add(value:p, key:"p")
                     if hasEmailSaved && hasPSaved {
-                        Settings.set(value:true, key:.hasSignedInWithEmail)
+                        Settings.set(value:true, key:.hasSignedInAnon)
                     }
                 } else {
                     Common.log(prefix:.debug, str:"Invalid client")
-                    completion(false, res.message)
+                    completion(res)
                 }
             } else {
                 Common.log(prefix:.debug, str:"Login \(res.success)")
             }
-            completion(res.success, res.message)
-        })
+            completion(res)
+        }
+    }
+    
+    static func signUp(p:String, completion: @escaping (Response) -> Void) {
+        let anonId:String = generateAnonId()
+        Connection.request(path:"/api/v1/auth/signup", post:["anon_id":anonId, "p":p, "client":"0", "locale":"en"]) { res in
+            if res.success {
+                if validate(client:res.data!) {
+                    Users.set(main:Users.to(from:res.data!))
+                    Settings.set(value:true, key:.hasSignedInWithEmail)
+                    Common.log(prefix:.debug, str:"Register \(res.success) as \(Users.main!.id)")
+                    let hasSavedAnonId:Bool = Secure.add(value:anonId, key:"anonId")
+                    let hasPSaved:Bool = Secure.add(value:p, key:"p")
+                    if hasSavedAnonId && hasPSaved {
+                        Settings.set(value:true, key:.hasSignedInAnon)
+                    }
+                } else {
+                    Common.log(prefix:.debug, str:"Invalid client")
+                    completion(res)
+                }
+            } else {
+                Common.log(prefix:.debug, str:"Login \(res.success)")
+            }
+            completion(res)
+        }
     }
     
     static func update(p:String, completion: @escaping (Bool, String) -> Void) {
-        let hashedP = Common.hash(str:p)
-        Connection.request(path:"/api/v1/auth/update", post:["p":hashedP], completion: {
+        Connection.request(path:"/api/v1/auth/update", post:["p":p]) {
             res in
             if res.success {
                 Settings.set(value:true, key:.needsToUpdatePassword)
-                let hasPSaved:Bool = Secure.add(value:hashedP, key:"p")
+                let hasPSaved:Bool = Secure.add(value:p, key:"p")
                 if hasPSaved {
                     Common.log(prefix:.debug, str:"New password ready")
                     completion(true, res.message)
@@ -77,16 +129,20 @@ class Authentication {
                 }
             }
             completion(res.success, res.message)
-        })
+        }
     }
     
-    static func credientials() -> (String?, String?) {
+    static func credientials() -> (String, String, Bool)? {
         if let email = Secure.get(key:"email") {
             if let p = Secure.get(key:"p") {
-                return (email, p)
+                return (email, p, false)
+            }
+        } else if let anonId = Secure.get(key:"anonId") {
+            if let p = Secure.get(key:"p") {
+                return (anonId, p, true)
             }
         }
-        return (nil, nil)
+        return nil
     }
     
     static func isValid(email:String) -> Bool {
@@ -112,9 +168,14 @@ class Authentication {
         return retrievedClientVersion == Config.prodVersion
     }
     
-    static func randomHashedP() -> String {
-        let orgStr:String = Common.words != nil ? Common.randPhrase(length:6, spaces:false)! : String(Common.rand(num:10))
-        return Common.hash(str:orgStr)
+    private static func generateAnonId() -> String {
+        let hashedDeviceId:String = Common.hash(str:(UIDevice.current.identifierForVendor?.uuidString)!)
+        Common.log(prefix:.debug, str:"Hashed anonId: \(hashedDeviceId)")
+        return hashedDeviceId
+    }
+    
+    static func randomP() -> String {
+        return Common.words != nil ? Common.randPhrase(length:6, spaces:false)! : String(Common.rand(num:10))
     }
     
 }

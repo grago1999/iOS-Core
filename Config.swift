@@ -9,14 +9,14 @@
 class Config {
     
     static let prodName:String = "some product name here"
-    static let prodVersion:String = "some unique version identifier"
+    static let prodVersion:String = "0.0.1"
     
     static let dev:Bool = true
     static let fake:Bool = false
     static let debugLevel:Common.LogType = .debug
     
-    static let url = dev ? "http://localhost" : "https://google.com"
-    static let analyticsUrl = dev ? "http://localhost" : "https://google.com"
+    static let url = dev ? "http://localhost:1313" : "https://google.com"
+    static let analyticsUrl = dev ? "http://localhost:1313" : "https://google.com"
     
     static let appId:Int64 = 987654321
     
